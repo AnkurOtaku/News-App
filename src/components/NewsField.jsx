@@ -62,8 +62,7 @@ const News = (props) => {
   };
 
   return (
-    <div id="top">
-      <h2 className="text-center m-3">News Highlights</h2>
+    <div className="my-4">
       {loading && <Loading />}
       <InfiniteScroll
         dataLength={articles.length}
@@ -87,9 +86,6 @@ const News = (props) => {
           ))}
         </div>
       </InfiniteScroll>
-      <a href="#top" className="top">
-        <span>&#x27A3;</span>
-      </a>
     </div>
   );
 };

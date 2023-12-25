@@ -21,7 +21,7 @@ export const AppReducer = (state, action) => {
 };
 
 // const initialState = {
-  // theme: "night",
+  // country: "night",
   // notes: [],
 // };
 
@@ -30,15 +30,15 @@ export const AppContext = createContext();
 export const AppProvider = (props) => {
   // eslint-disable-next-line
   // const [state, dispatch] = useReducer(AppReducer, initialState);
-  const [theme, setTheme] = useState("night");
+  const [country, setCountry] = useState(null);
 
   return (
     <AppContext.Provider
       value={{
         // dispatch,
         // notes: state.notes,
-        theme: theme,
-        setTheme: setTheme,
+        country: country,
+        setCountry: setCountry,
       }}
     >
       {props.children}

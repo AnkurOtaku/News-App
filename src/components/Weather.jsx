@@ -1,40 +1,109 @@
-import React, { useEffect, useState } from "react";
-// import { AppContext } from "../store/store";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
+import Loading from "./Loading";
+import { AppContext } from "../store/store";
+// import {countryList} from '../country-by-capital-city.json'
 
 function Weather() {
-  // const {ApiKey} = useContext(AppContext);
-  const ApiKey = process.env.REACT_APP_WEATHER_API_KEY;
+  const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
+  const { country } = useContext(AppContext);
 
   useEffect(() => {
-    const fetchData = async () => {
+    // get real location data
+    console.log('inside useeffect');
+    const getLiveData = async () => {
       try {
-        console.log("Fetching data...");
-        const response = await axios.get("https://api.openweathermap.org/data/2.5/weather?", {
-          params: {
-            appid: ApiKey,
-            lat: "44.34",
-            lon: "10.99",
-          },
+        const currentLocation = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolve({
+                lat: position.coords.latitude,
+                lon: position.coords.longitude,
+              });
+            },
+            (error) => {
+              reject(error);
+            }
+          );
         });
-  
+    
+        console.log('Current location:', currentLocation);
+    
+        const response = await axios.get(
+          "https://api.openweathermap.org/data/2.5/weather?",
+          {
+            params: {
+              appid: apiKey,
+              lat: currentLocation.lat,
+              lon: currentLocation.lon,
+            },
+          }
+        );
+    
         const apiResponse = response.data;
-        console.log("Weather data:", apiResponse);
-        setWeatherData(apiResponse.current);
+        setWeatherData(apiResponse);
+      } catch (error) {
+        console.error("Error fetching current weather data:", error);
+        setError("Error fetching current weather data");
+      }
+    };
+    
+
+    // data of desired country
+    const fetchData = async () => {
+      console.log('inside fetchdata');
+      try {
+        const city = await axios.get(
+          "http://api.openweathermap.org/geo/1.0/direct?",
+          {
+            params: {
+              q: country.capital,
+              limit: 5,
+              appid: apiKey,
+            },
+          }
+        );
+        const lat = city.data[0].lat;
+        const lon = city.data[0].lon;
+        console.log("lat and lon: " + lat, lon);
+
+        try {
+          console.log('inside 2nd try');
+          const response = await axios.get(
+            "https://api.openweathermap.org/data/2.5/weather?",
+            {
+              params: {
+                appid: apiKey,
+                lat: lat,
+                lon: lon,
+              },
+            }
+          );
+
+          const apiResponse = response.data;
+          setWeatherData(apiResponse);
+        } catch (error) {
+          console.error("Error fetching weather data:", error);
+          setError("Error fetching weather data");
+        }
       } catch (error) {
         console.error("Error fetching weather data:", error);
         setError("Error fetching weather data");
       }
     };
-  
-    fetchData();
-  }, [ApiKey]);
+
+    country ? fetchData() : getLiveData();
+  }, [country]);
+
+  if (!weatherData) {
+    return <Loading />;
+  }
 
   return (
     <div className="w-full h-8 md:h-12 bg-[#37A7BF] text-black">
-    {weatherData ? (
+      {weatherData ? (
         <div className="mx-auto h-full max-w-5xl flex justify-evenly p-2">
           <div className="flex place-content-center items-center">
             <svg
@@ -49,7 +118,7 @@ function Weather() {
                 fill="black"
               />
             </svg>
-            <div className="mx-2">Sunny 30degree</div>
+            <div className="mx-2 capitalize">{weatherData.weather[0].main}</div>
           </div>
           <div className="flex place-content-center items-center">
             <svg
@@ -72,7 +141,7 @@ function Weather() {
                 fill="#292D32"
               />
             </svg>
-            <div className="mx-2">5km/hr</div>
+            <div className="mx-2">{weatherData.wind.speed}km/hr</div>
           </div>
           <div className="flex place-content-center items-center">
             <svg
@@ -83,19 +152,19 @@ function Weather() {
               fill="none"
             >
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="M16.0223 17.6473C15.7137 17.638 15.4067 17.686 15.126 17.7875C14.8452 17.889 14.5986 18.0412 14.406 18.2317C14.0071 18.6213 13.8065 19.1147 13.8065 19.7118C13.8065 20.3126 14.0048 20.8078 14.4013 21.1938C14.7979 21.5816 15.3375 21.7745 16.02 21.7745C16.7094 21.7745 17.2489 21.5816 17.6432 21.1974C18.0375 20.8133 18.2335 20.3163 18.2335 19.7118C18.2335 19.0983 18.0375 18.6013 17.6455 18.2208C17.2582 17.8367 16.7163 17.6473 16.0223 17.6473ZM16.0223 21.0245C15.2983 21.0245 14.934 20.5857 14.934 19.7082C14.934 18.8307 15.296 18.3919 16.0223 18.3919C16.7463 18.3919 17.1106 18.8307 17.1106 19.7082C17.1083 20.5875 16.7463 21.0245 16.0223 21.0245ZM11.254 15.4718C11.6483 15.0876 11.8443 14.5906 11.8443 13.9862C11.8443 13.3726 11.6483 12.8756 11.2586 12.4951C10.8666 12.1146 10.3248 11.9235 9.63074 11.9235C8.95285 11.9235 8.41331 12.1183 8.01441 12.5079C7.61552 12.8975 7.41492 13.3909 7.41492 13.988C7.41492 14.5888 7.61321 15.084 8.0098 15.4699C8.40639 15.8577 8.94594 16.0507 9.62844 16.0507C10.3179 16.0507 10.8597 15.8577 11.254 15.4718ZM8.54243 13.9862C8.54243 13.1087 8.90443 12.6699 9.63074 12.6699C10.3571 12.6699 10.7191 13.1087 10.7191 13.9862C10.7191 14.8637 10.3571 15.3024 9.63074 15.3024C8.90443 15.3024 8.54243 14.8637 8.54243 13.9862ZM16.5803 11.9999C16.4289 11.9274 16.2472 11.9053 16.0752 11.9384C15.9031 11.9715 15.7548 12.0572 15.6626 12.1765L8.84909 20.9717C8.78791 21.0516 8.75468 21.1429 8.75278 21.2363C8.75088 21.3297 8.78039 21.4218 8.83829 21.5032C8.89618 21.5846 8.9804 21.6525 9.08235 21.6998C9.1843 21.7472 9.30034 21.7723 9.41861 21.7727C9.53321 21.7733 9.646 21.7502 9.74587 21.7058C9.84574 21.6614 9.92923 21.5973 9.98813 21.5197L16.8016 12.7245C16.8475 12.6655 16.8782 12.5999 16.8919 12.5315C16.9056 12.4631 16.902 12.3933 16.8815 12.3259C16.8609 12.2586 16.8237 12.1952 16.772 12.1392C16.7203 12.0833 16.6552 12.036 16.5803 11.9999Z"
                 fill="black"
               />
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
+                fillRule="evenodd"
+                clipRule="evenodd"
                 d="M12.8265 0.969177C12.8265 0.969177 0.8573 14.6452 0.8573 19.8684C0.8573 25.0916 6.21125 29.3172 12.8265 29.3172C19.4417 29.3172 24.7956 25.0916 24.7956 19.8684C24.7956 14.6452 12.8265 0.969177 12.8265 0.969177ZM19.6376 22.4864C18.7246 22.501 18.2012 22.6321 16.2597 23.1254L15.983 23.1946C14.6549 23.6133 13.5505 23.8409 12.8795 23.8409C11.7497 23.8409 9.88662 23.2256 9.86817 23.2183L9.49003 23.12C7.45405 22.6047 6.96984 22.4828 6.15591 22.4755C5.41346 22.4755 4.66871 22.572 3.88475 22.7668C3.36531 21.8348 3.09452 20.8284 3.08927 19.8102C3.08927 16.9319 8.24493 9.6296 12.8218 4.04411C17.3988 9.63142 22.5567 16.9355 22.5567 19.8102C22.5567 20.8024 22.2916 21.7928 21.7682 22.7559C21.0782 22.5853 20.3606 22.4946 19.6376 22.4864Z"
                 fill="black"
               />
             </svg>
-            <div className="mx-2">Dry</div>
+            <div className="mx-2">{weatherData.main.humidity}</div>
           </div>
         </div>
       ) : error ? (

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import Loading from "./Loading";
 import { AppContext } from "../store/store";
-// import {countryList} from '../country-by-capital-city.json'
 
 function Weather() {
   const apiKey = process.env.REACT_APP_WEATHER_API_KEY;

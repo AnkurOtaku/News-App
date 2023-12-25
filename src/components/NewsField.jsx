@@ -11,6 +11,7 @@ const NewsField = (props) => {
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const { country } = useContext(AppContext);
+  const [error, setError] = useState(null);
   const apiKey = process.env.REACT_APP_NEWS_API_KEY;
 
   useEffect(() => {
@@ -23,43 +24,55 @@ const NewsField = (props) => {
   const updateNews = async () => {
     setLoading(true);
 
-    let url =
-      props.category === "search"
-        ? `https://newsapi.org/v2/everything?q=${props.querry}&from=2022-10-${props.newsFrom}&to=2022-10-${props.newsTo}&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
-        : `https://newsapi.org/v2/top-headlines?country=${country.code}&category=${props.category}&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`;
+    try {
+      let url =
+        props.category === "search"
+          ? `https://newsapi.org/v2/everything?q=${props.querry}&from=2022-10-${props.newsFrom}&to=2022-10-${props.newsTo}&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
+          : `https://newsapi.org/v2/top-headlines?country=${
+              country.code ? country.code : "in"
+            }&category=${
+              props.category
+            }&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`;
 
-    let data = await fetch(url);
-    let parsedData = await data.json();
+      let data = await fetch(url);
+      let parsedData = await data.json();
 
-    setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
-    setTotalResults(parsedData.totalResults);
-    setLoading(false);
+      setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
+      setTotalResults(parsedData.totalResults);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching current news data:", error);
+      setError("Error fetching current news data");
+    }
   };
 
   const fetchMoreData = async () => {
-    let url =
-      props.category === "search"
-        ? `https://newsapi.org/v2/everything?q=${props.querry}&from=2022-10-${
-            props.newsFrom
-          }&to=2022-10-${
-            props.newsTo
-          }&sortBy=popularity&apiKey=cbdc6197856e4d1c8fe87f5b7de7a51e&page=${
-            page + 1
-          }&pageSize=${props.pageSize}`
-        : `https://newsapi.org/v2/top-headlines?country=${
-            props.country
-          }&category=${
-            props.category
-          }&apiKey=cbdc6197856e4d1c8fe87f5b7de7a51e&page=${page + 1}&pageSize=${
-            props.pageSize
-          }`;
+    try {
+      let url =
+        props.category === "search"
+          ? `https://newsapi.org/v2/everything?q=${props.querry}&from=2022-10-${
+              props.newsFrom
+            }&to=2022-10-${
+              props.newsTo
+            }&sortBy=popularity&apiKey=${apiKey}&page=${page + 1}&pageSize=${
+              props.pageSize
+            }`
+          : `https://newsapi.org/v2/top-headlines?country=${
+              country.code ? country.code : "in"
+            }&category=${props.category}&apiKey=${apiKey}&page=${
+              page + 1
+            }&pageSize=${props.pageSize}`;
 
-    setPage((prevPage) => prevPage + 1);
-    let data = await fetch(url);
-    let parsedData = await data.json();
+      setPage((prevPage) => prevPage + 1);
+      let data = await fetch(url);
+      let parsedData = await data.json();
 
-    setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
-    setTotalResults(parsedData.totalResults);
+      setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
+      setTotalResults(parsedData.totalResults);
+    } catch (error) {
+      console.error("Error fetching current news data:", error);
+      setError("Error fetching current news data");
+    }
   };
 
   return (
@@ -72,7 +85,7 @@ const NewsField = (props) => {
         loader={<Loading />}
       >
         <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-          {articles.map((element, index) => (
+          {articles ? articles.map((element, index) => (
             <div className="" key={index}>
               <NewsCard
                 title={element.title}
@@ -84,7 +97,7 @@ const NewsField = (props) => {
                 newsUrl={element.url}
               />
             </div>
-          ))}
+          )):<div className="col-span-3 border text-xl text-center font-semibold">{error}</div>}
         </div>
       </InfiniteScroll>
     </div>

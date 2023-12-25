@@ -76,7 +76,7 @@ function Navbar() {
               aria-expanded="true"
               onClick={()=>setDropdown(!dropdown)}
             >
-              {country ? country.country : "Current Location"}
+              {country ? country.country : "Live Location"}
               <svg
                 className="-mr-1 ml-2 h-5 w-5 rotate-180"
                 fill="currentColor"

@@ -10,8 +10,7 @@ const NewsField = (props) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const { country } = useContext(AppContext);
-  const [error, setError] = useState(null);
+  const { country, querry, category } = useContext(AppContext);
   const apiKey = process.env.REACT_APP_NEWS_API_KEY;
 
   useEffect(() => {
@@ -19,50 +18,47 @@ const NewsField = (props) => {
     setTotalResults(0);
     setPage(1);
     updateNews();
-  }, [country]);
+  }, [country, querry, category]);
 
   const updateNews = async () => {
     setLoading(true);
 
     try {
-      let url =
-        props.category === "search"
-          ? `https://newsapi.org/v2/everything?q=${props.querry}&from=2022-10-${props.newsFrom}&to=2022-10-${props.newsTo}&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
-          : `https://newsapi.org/v2/top-headlines?country=${
-              country.code ? country.code : "in"
-            }&category=${
-              props.category
-            }&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`;
+      let url = country
+        ? `https://newsapi.org/v2/top-headlines?country=${country.code}&category=${category}&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
+        : `https://newsapi.org/v2/everything?q=${
+            querry ? querry : props.querry
+          }&from=2022-10-${props.newsFrom}&to=2022-10-${
+            props.newsTo
+          }&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${
+            props.pageSize
+          }`;
 
       let data = await fetch(url);
       let parsedData = await data.json();
-
       setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
       setTotalResults(parsedData.totalResults);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching current news data:", error);
-      setError("Error fetching current news data");
     }
   };
 
   const fetchMoreData = async () => {
     try {
-      let url =
-        props.category === "search"
-          ? `https://newsapi.org/v2/everything?q=${props.querry}&from=2022-10-${
-              props.newsFrom
-            }&to=2022-10-${
-              props.newsTo
-            }&sortBy=popularity&apiKey=${apiKey}&page=${page + 1}&pageSize=${
-              props.pageSize
-            }`
-          : `https://newsapi.org/v2/top-headlines?country=${
-              country.code ? country.code : "in"
-            }&category=${props.category}&apiKey=${apiKey}&page=${
-              page + 1
-            }&pageSize=${props.pageSize}`;
-
+      let url = country
+        ? `https://newsapi.org/v2/top-headlines?country=${
+            country.code
+          }&category=${category}&apiKey=${apiKey}&page=${
+            page + 1
+          }&pageSize=${props.pageSize}`
+        : `https://newsapi.org/v2/everything?q=${
+            querry ? querry : props.querry
+          }&from=2022-10-${props.newsFrom}&to=2022-10-${
+            props.newsTo
+          }&sortBy=popularity&apiKey=${apiKey}&page=${page + 1}&pageSize=${
+            props.pageSize
+          }`;
       setPage((prevPage) => prevPage + 1);
       let data = await fetch(url);
       let parsedData = await data.json();
@@ -71,7 +67,6 @@ const NewsField = (props) => {
       setTotalResults(parsedData.totalResults);
     } catch (error) {
       console.error("Error fetching current news data:", error);
-      setError("Error fetching current news data");
     }
   };
 
@@ -85,39 +80,43 @@ const NewsField = (props) => {
         loader={<Loading />}
       >
         <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-          {articles ? articles.map((element, index) => (
-            <div className="" key={index}>
-              <NewsCard
-                title={element.title}
-                description={element.description}
-                imageUrl={element.urlToImage}
-                author={element.author}
-                date={element.publishedAt}
-                content={element.content}
-                newsUrl={element.url}
-              />
-            </div>
-          )):<div className="col-span-3 border text-xl text-center font-semibold">{error}</div>}
+          {articles && (
+            articles.map((element, index) => (
+              <div className="" key={index}>
+                <NewsCard
+                  title={element.title}
+                  description={element.description}
+                  imageUrl={element.urlToImage}
+                  author={element.author}
+                  date={element.publishedAt}
+                  content={element.content}
+                  newsUrl={element.url}
+                />
+              </div>
+            ))
+          )}
         </div>
       </InfiniteScroll>
     </div>
   );
 };
 
+const currentDate = new Date();
+const currentMonth = currentDate.getMonth() + 1;
+const currentYear = currentDate.getFullYear();
+
 NewsField.defaultProps = {
   pageSize: 12,
-  category: "general",
-  querry: "",
-  newsFrom: 1,
-  newsTo: new Date().getDate(),
+  querry: "new",
+  newsFrom: `${currentYear}-${currentMonth}-1`,
+  newsTo: `${currentDate}`,
 };
 
 NewsField.propTypes = {
   pageSize: PropTypes.number,
-  category: PropTypes.string,
   querry: PropTypes.string,
-  newsFrom: PropTypes.number,
-  newsTo: PropTypes.number,
+  newsFrom: PropTypes.string,
+  newsTo: PropTypes.string,
 };
 
 export default NewsField;

@@ -1,3 +1,4 @@
+import Category from "./components/Category.jsx";
 import Navbar from "./components/Navbar.jsx";
 import NewsField from "./components/NewsField.jsx";
 import Weather from "./components/Weather.jsx";
@@ -8,6 +9,7 @@ function App() {
     <AppProvider>
       <Navbar />
       <Weather />
+      <Category/>
       <NewsField />
     </AppProvider>
   );

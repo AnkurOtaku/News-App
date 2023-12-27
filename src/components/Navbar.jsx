@@ -5,7 +5,7 @@ import countryList from '../country_capital_code.json'
 
 function Navbar() {
   const [popup, setPopup] = useState(false);
-  const { country, setCountry } = useContext(AppContext);
+  const { country, setCountry, setQuerry } = useContext(AppContext);
   const [dropdown, setDropdown] = useState(false);
 
   const handleClick = (value) => {
@@ -13,7 +13,15 @@ function Navbar() {
     console.log(value);
     setDropdown(!dropdown);
   };
-  //make function to toggle dropdown
+  
+  function handleSubmit(e){
+    e.preventDefault();
+    if(e.target.elements.searchInput.value){
+      setCountry(false);
+      setQuerry(e.target.elements.searchInput.value);
+      console.log(e.target.elements.searchInput.value, country);
+    }
+  }
 
   return (
     <>
@@ -25,11 +33,12 @@ function Navbar() {
         </h1>
 
         {/* search bar */}
-        <form className="hidden md:flex">
+        <form className="hidden md:flex" onSubmit={(e)=>handleSubmit(e)}>
           <div className="rounded-md w-80 flex justify-center items-center bg-[#A75F5F]">
             <input
               className="mx-4 w-4/5 bg-transparent text-white focus:outline-none"
               placeholder="search"
+              name="searchInput"
             />
             <button className="m-1">
               <svg
@@ -46,23 +55,6 @@ function Navbar() {
               </svg>
             </button>
           </div>
-          <button className="mx-2 w-8 aspect-square items-center rounded-full flex border-none place-content-center bg-[#863E3E]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="16"
-              viewBox="0 0 17 16"
-              fill="none"
-            >
-              <path
-                d="M2 2.00012L8.30415 14.1656L14.6083 2.00012"
-                stroke="white"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
         </form>
 
         {/* dropdown */}
@@ -70,7 +62,7 @@ function Navbar() {
           <div>
             <button
               type="button"
-              className="inline-flex justify-center items-center px-4 py-2 w-32 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-gray-700"
+              className="inline-flex justify-center items-center px-4 py-2 w-32 h-[38px] border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-gray-700"
               id="options-menu"
               aria-haspopup="true"
               aria-expanded="true"
@@ -100,14 +92,21 @@ function Navbar() {
                   aria-orientation="vertical"
                   aria-labelledby="options-menu"
                 >
-                  {countryList.map((country) => (
+                  <a 
+                    className={`block w-full px-4 py-2 rounded-md text-center text-sm text-gray-700 ${!country?'bg-black text-white':'hover:bg-gray-100 hover:text-gray-900'}`}
+                    href="/"
+              >
+                Live Location
+              </a>
+                  {countryList.map((item) => (
                     <button
-                      key={country.code}
-                      onClick={() => handleClick(country)}
-                      className="block w-full px-4 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      key={item.code}
+                      onClick={() => handleClick(item)}
+                      className={`block w-full px-4 py-2 rounded-md text-sm text-gray-700 ${country&&item.country===country.country?'bg-black text-white':'hover:bg-gray-100 hover:text-gray-900'}`}
                       role="menuitem"
+                      // disabled={country?false:country.country===item.country?true:false}
                     >
-                      {country.country}
+                      {item.country}
                     </button>
                   ))}
                 </div>
@@ -115,14 +114,12 @@ function Navbar() {
             </div>
           )}
         </div>
-        {/* End Dropdown */}
 
         {/* update icon */}
         <button
           className="mx-3 p-2 rounded-full"
           onClick={() => {
             setPopup(true);
-            console.log(popup);
           }}
         >
           <svg

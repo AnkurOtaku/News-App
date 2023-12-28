@@ -15,6 +15,11 @@ function Error() {
       description:
         "Your API key was missing from the request, or wasn't correct.",
     },
+    426: {
+        heading: "Data Not For Production Use",
+        description:
+          "Upgrade of current plan required.",
+      },
     429: {
       heading: "Too Many Requests",
       description:

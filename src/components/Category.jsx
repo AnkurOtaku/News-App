@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { AppContext } from "../store/store";
 
 function Category() {
-  const { country, category, setCategory } = useContext(AppContext);
+  const { country, category, error, setCategory } = useContext(AppContext);
   const list = [
     "general",
     "business",
@@ -19,10 +19,10 @@ function Category() {
 
   return (
     <>
-      {country && (
+      {country && !error && (
         <div className="mx-auto max-w-5xl grid grid-rows-2 grid-cols-4 gap-2 p-1 md:p-2 text-sm md:text-base">
           {list.map((item) => (
-            <button
+            <button key={item}
               className={`border rounded-md px-2 py-1 capitalize ${
                 category === item
                   ? "bg-[#223363] text-white"

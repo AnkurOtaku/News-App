@@ -7,6 +7,7 @@ export const AppProvider = (props) => {
   const [country, setCountry] = useState(false);
   const [querry, setQuerry] = useState(false);
   const [category, setCategory] = useState('general');
+  const [error, setError] = useState(false);
 
   return (
     <AppContext.Provider
@@ -17,6 +18,8 @@ export const AppProvider = (props) => {
         setQuerry: setQuerry,
         category: category,
         setCategory: setCategory,
+        error: error,
+        setError: setError,
       }}
     >
       {props.children}

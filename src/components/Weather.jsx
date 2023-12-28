@@ -186,14 +186,15 @@ function Weather() {
         </button>
       </div>
       {toggle && (
-        <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2">
-          <div className="flex gap-2">
+        <div className="mx-auto max-w-5xl flex justify-evenly gap-2 p-1 md:p-2">
+          <div className="text-center">
             <svg
               version="1.0"
               id="Layer_1"
               width="20px"
               height="20px"
               viewBox="0 0 70 70"
+              className="inline-block"
             >
               <path
                 fill="#231F20"
@@ -206,13 +207,13 @@ function Weather() {
                 d="M32,12c-6.627,0-12,5.373-12,12s5.373,12,12,12s12-5.373,12-12S38.627,12,32,12z M32,34
 		c-5.523,0-10-4.478-10-10s4.477-10,10-10s10,4.478,10,10S37.523,34,32,34z"
               />
-            </svg>{" "}
-            {country? country.capital: `(${lat} ${lon})`}
+            </svg>
+            {country? ` ${country.capital}`: ` (${lat} ${lon})`}
           </div>
-          <div className="">Feels Like : {weatherData.main.feels_like}°C</div>
-          <div className=""> Min/Max Temp: {weatherData.main.temp_min}°C/{weatherData.main.temp_max}°C
+          <div className="text-center">Feels Like : <b>{weatherData.main.feels_like}°C</b></div>
+          <div className="text-center"> Min/Max Temp: <b>{weatherData.main.temp_min}°C</b>/<b>{weatherData.main.temp_max}°C</b>
           </div>
-          <div className="">Visibility: {weatherData.visibility/1000}km</div>
+          <div className="text-center">Visibility: <b>{weatherData.visibility/1000}km</b></div>
         </div>
       )}
     </div>

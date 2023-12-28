@@ -10,7 +10,7 @@ const NewsField = (props) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const { country, querry, category } = useContext(AppContext);
+  const { country, querry, category, setError } = useContext(AppContext);
   const apiKey = process.env.REACT_APP_NEWS_API_KEY;
 
   useEffect(() => {
@@ -23,42 +23,47 @@ const NewsField = (props) => {
   const updateNews = async () => {
     setLoading(true);
 
-    try {
-      let url = country
-        ? `https://newsapi.org/v2/top-headlines?country=${country.code}&category=${category}&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
-        : `https://newsapi.org/v2/everything?q=${
-            querry ? querry : props.querry
-          }&from=2022-10-${props.newsFrom}&to=2022-10-${
-            props.newsTo
-          }&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${
-            props.pageSize
-          }`;
+    let url = country
+      ? `https://newsapi.org/v2/top-headlines?country=${country.code}&category=${category}&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
+      : `https://newsapi.org/v2/everything?q=${
+          querry ? querry : props.querry
+        }&from=2022-10-${props.newsFrom}&to=2022-10-${
+          props.newsTo
+        }&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${
+          props.pageSize
+        }`;
 
+    try {
       let data = await fetch(url);
-      let parsedData = await data.json();
-      setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
-      setTotalResults(parsedData.totalResults);
-      setLoading(false);
+      if(data.status===200){
+        let parsedData = await data.json();
+        setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
+        setTotalResults(parsedData.totalResults);
+      } else {
+        setError(data.status);
+      }
     } catch (error) {
       console.error("Error fetching current news data:", error);
+      setError(404);
     }
+    setLoading(false);
   };
 
   const fetchMoreData = async () => {
+    let url = country
+      ? `https://newsapi.org/v2/top-headlines?country=${
+          country.code
+        }&category=${category}&apiKey=${apiKey}&page=${
+          page + 1
+        }&pageSize=${props.pageSize}`
+      : `https://newsapi.org/v2/everything?q=${
+          querry ? querry : props.querry
+        }&from=2022-10-${props.newsFrom}&to=2022-10-${
+          props.newsTo
+        }&sortBy=popularity&apiKey=${apiKey}&page=${page + 1}&pageSize=${
+          props.pageSize
+        }`;
     try {
-      let url = country
-        ? `https://newsapi.org/v2/top-headlines?country=${
-            country.code
-          }&category=${category}&apiKey=${apiKey}&page=${
-            page + 1
-          }&pageSize=${props.pageSize}`
-        : `https://newsapi.org/v2/everything?q=${
-            querry ? querry : props.querry
-          }&from=2022-10-${props.newsFrom}&to=2022-10-${
-            props.newsTo
-          }&sortBy=popularity&apiKey=${apiKey}&page=${page + 1}&pageSize=${
-            props.pageSize
-          }`;
       setPage((prevPage) => prevPage + 1);
       let data = await fetch(url);
       let parsedData = await data.json();

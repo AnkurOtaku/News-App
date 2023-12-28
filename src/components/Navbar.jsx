@@ -25,16 +25,16 @@ function Navbar() {
 
   return (
     <>
-      <div className="h-18 py-1 md:py-4 min-w-full bg-[#A13737] flex items-center place-content-around">
+      <div className="h-18 py-1 px-2 md:py-4 min-w-full bg-[#A13737] grid grid-rows-2 grid-cols-3 justify-items-center md:grid-rows-1 md:grid-cols-4 items-center place-content-around gap-2">
         
         {/* heading */}
-        <h1 className="px-4 text-3xl text-white font-semibold self-center">
+        <h1 className="px-4 text-3xl col-span-2 md:col-span-1 order-1 text-white font-semibold self-center">
           Worldwide News
         </h1>
 
         {/* search bar */}
-        <form className="hidden md:flex" onSubmit={(e)=>handleSubmit(e)}>
-          <div className="rounded-md w-80 flex justify-center items-center bg-[#A75F5F]">
+        <form className="flex order-3 md:order-2 col-span-2 md:col-span-1" onSubmit={(e)=>handleSubmit(e)}>
+          <div className="rounded-md flex justify-center items-center bg-[#A75F5F]">
             <input
               className="mx-4 w-4/5 bg-transparent text-white focus:outline-none"
               placeholder="search"
@@ -58,11 +58,11 @@ function Navbar() {
         </form>
 
         {/* dropdown */}
-        <div className="relative inline-block text-left">
+        <div className="relative order-2 md:order-3 inline-block text-left">
           <div>
             <button
               type="button"
-              className="inline-flex justify-center items-center px-4 py-2 w-32 h-[38px] border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-gray-700"
+              className="inline-flex justify-center items-center px-4 py-2 h-[38px] border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-gray-700"
               id="options-menu"
               aria-haspopup="true"
               aria-expanded="true"
@@ -117,7 +117,7 @@ function Navbar() {
 
         {/* update icon */}
         <button
-          className="mx-3 p-2 rounded-full"
+          className="mx-3 p-2 rounded-full order-4"
           onClick={() => {
             setPopup(true);
           }}
@@ -140,45 +140,6 @@ function Navbar() {
         </button>
 
       </div>
-      <form className="md:hidden flex bg-[#A13737] justify-center pb-2">
-        <div className="rounded-md max-w-md flex justify-center items-center bg-[#A75F5F]">
-          <input
-            className="mx-4 w-4/5 bg-transparent text-white focus:outline-none"
-            placeholder="search"
-          />
-          <button className="m-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="25"
-              height="22"
-              viewBox="0 0 31 29"
-              fill="none"
-            >
-              <path
-                d="M22.4513 18.483H21.0831L20.5982 18.0481C22.6764 15.7926 23.7502 12.7155 23.1614 9.445C22.3474 4.96625 18.3294 1.3897 13.4801 0.841937C6.15416 0.00418556 -0.011394 5.73956 0.889192 12.5543C1.47804 17.0653 5.32285 20.803 10.1375 21.5602C13.6533 22.1079 16.9612 21.1091 19.3858 19.1758L19.8535 19.6269V20.8996L27.214 27.7466C27.9241 28.4072 29.0845 28.4072 29.7945 27.7466C30.5046 27.0861 30.5046 26.0067 29.7945 25.3462L22.4513 18.483ZM12.0599 18.483C7.7475 18.483 4.26639 15.2448 4.26639 11.2333C4.26639 7.22174 7.7475 3.9835 12.0599 3.9835C16.3723 3.9835 19.8535 7.22174 19.8535 11.2333C19.8535 15.2448 16.3723 18.483 12.0599 18.483Z"
-                fill="white"
-              />
-            </svg>
-          </button>
-        </div>
-        <button className="mx-2 w-8 aspect-square items-center rounded-full flex border-none place-content-center bg-[#863E3E]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="17"
-            height="16"
-            viewBox="0 0 17 16"
-            fill="none"
-          >
-            <path
-              d="M2 2.00012L8.30415 14.1656L14.6083 2.00012"
-              stroke="white"
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-      </form>
       {popup && <Updates popup={popup} setPopup={setPopup} />}
     </>
   );

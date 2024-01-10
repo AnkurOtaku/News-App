@@ -585,8 +585,6 @@ function Error() {
         }
     ];
 
-    console.log(error);
-
   return (
     error && (
       <>

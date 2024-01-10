@@ -12,7 +12,7 @@ const NewsItem = ({
   return (
     <div className="w-full border rounded-md h-full overflow-x-hidden hover:shadow-xl hover:shadow-[#A13737]">
       <img
-        src={imageUrl ? imageUrl : defaultImage}
+        src={imageUrl ? imageUrl==="https://transasianews.com/sites/all/modules/glossify/info.png"? defaultImage: imageUrl : defaultImage}
         className="object-cover aspect-video"
         alt="..."
         loading="lazy"

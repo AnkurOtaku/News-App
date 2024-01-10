@@ -11,6 +11,7 @@ const NewsField = (props) => {
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const { country, querry, category, setError } = useContext(AppContext);
+
   var myHeaders = new Headers();
   myHeaders.append("apikey", process.env.REACT_APP_NEWS_API_KEY);
 
@@ -31,20 +32,17 @@ const NewsField = (props) => {
   const updateNews = async () => {
     setLoading(true);
 
-    let url = country
-      ? `https://api.apilayer.com/world_news/search-news?source-countries=${country.code}&sort=publish-time&language=en&number=100`
-      : `https://api.apilayer.com/world_news/search-news?text=${
-          querry ? querry : props.querry
-        }&sort=publish-time&number=${props.pageSize}&language=en`;
+    let url = `https://api.apilayer.com/world_news/search-news?${
+      querry ? `text=${querry}&` : ''
+    }${country ? `source-countries=${country.code}&` : ''}number=${
+      props.pageSize
+    }&sort=publish-time&language=en&sort-direction=desc`;
 
     try {
-      let data = await fetch(url,requestOptions);
+      let data = await fetch(url, requestOptions);
       if (data.status === 200) {
         let parsedData = await data.json();
-        setArticles((prevArticles) => [
-          ...prevArticles,
-          ...parsedData.news,
-        ]);
+        setArticles((prevArticles) => [...prevArticles, ...parsedData.news]);
         setTotalResults(parsedData.available);
       } else {
         setError(data.status);
@@ -57,20 +55,27 @@ const NewsField = (props) => {
   };
 
   const fetchMoreData = async () => {
-    let url = country
-      ? `https://api.apilayer.com/world_news/search-news?source-countries=${country.code}&sort=publish-time&language=en&number=100`
-      : `https://api.apilayer.com/world_news/search-news?text=${
-          querry ? querry : props.querry
-        }&sort=publish-time&number=${props.pageSize}&language=en`;
-    try {
-      setPage((prevPage) => prevPage + 1);
-      let data = await fetch(url,requestOptions);
-      let parsedData = await data.json();
+    let url = `https://api.apilayer.com/world_news/search-news?${
+      querry ? `text=${querry}&` : ''
+    }${country ? `source-countries=${country.code}&` : ''}number=${
+      12 * page + props.pageSize
+    }&offset=${
+      12 * page
+    }&sort=publish-time&language=en&sort-direction=desc`;
 
-      setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
-      setTotalResults(parsedData.totalResults);
+    try {
+      let data = await fetch(url, requestOptions);
+      if (data.status === 200) {
+        let parsedData = await data.json();
+        setArticles((prevArticles) => [...prevArticles, ...parsedData.news]);
+        setTotalResults(parsedData.available);
+        setPage((prevPage) => prevPage + 1);
+      } else {
+        setError(data.status);
+      }
     } catch (error) {
       console.error("Error fetching current news data:", error);
+      setError(404);
     }
   };
 

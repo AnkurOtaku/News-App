@@ -11,7 +11,14 @@ const NewsField = (props) => {
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const { country, querry, category, setError } = useContext(AppContext);
-  const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+  var myHeaders = new Headers();
+  myHeaders.append("apikey", process.env.REACT_APP_NEWS_API_KEY);
+
+  var requestOptions = {
+    method: "GET",
+    redirect: "follow",
+    headers: myHeaders,
+  };
 
   useEffect(() => {
     setArticles([]);
@@ -24,21 +31,20 @@ const NewsField = (props) => {
     setLoading(true);
 
     let url = country
-      ? `https://newsapi.org/v2/top-headlines?country=${country.code}&category=${category}&apiKey=${apiKey}&page=${page}&pageSize=${props.pageSize}`
-      : `https://newsapi.org/v2/everything?q=${
+      ? `https://api.apilayer.com/world_news/search-news?source-countries=${country.code}&sort=publish-time&language=en&number=100`
+      : `https://api.apilayer.com/world_news/search-news?text=${
           querry ? querry : props.querry
-        }&from=2022-10-${props.newsFrom}&to=2022-10-${
-          props.newsTo
-        }&sortBy=popularity&apiKey=${apiKey}&page=${page}&pageSize=${
-          props.pageSize
-        }`;
+        }&sort=publish-time&number=${props.pageSize}&language=en`;
 
     try {
-      let data = await fetch(url);
-      if(data.status===200){
+      let data = await fetch(url,requestOptions);
+      if (data.status === 200) {
         let parsedData = await data.json();
-        setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
-        setTotalResults(parsedData.totalResults);
+        setArticles((prevArticles) => [
+          ...prevArticles,
+          ...parsedData.news,
+        ]);
+        setTotalResults(parsedData.available);
       } else {
         setError(data.status);
       }
@@ -51,21 +57,13 @@ const NewsField = (props) => {
 
   const fetchMoreData = async () => {
     let url = country
-      ? `https://newsapi.org/v2/top-headlines?country=${
-          country.code
-        }&category=${category}&apiKey=${apiKey}&page=${
-          page + 1
-        }&pageSize=${props.pageSize}`
-      : `https://newsapi.org/v2/everything?q=${
+      ? `https://api.apilayer.com/world_news/search-news?source-countries=${country.code}&sort=publish-time&language=en&number=100`
+      : `https://api.apilayer.com/world_news/search-news?text=${
           querry ? querry : props.querry
-        }&from=2022-10-${props.newsFrom}&to=2022-10-${
-          props.newsTo
-        }&sortBy=popularity&apiKey=${apiKey}&page=${page + 1}&pageSize=${
-          props.pageSize
-        }`;
+        }&sort=publish-time&number=${props.pageSize}&language=en`;
     try {
       setPage((prevPage) => prevPage + 1);
-      let data = await fetch(url);
+      let data = await fetch(url,requestOptions);
       let parsedData = await data.json();
 
       setArticles((prevArticles) => [...prevArticles, ...parsedData.articles]);
@@ -85,21 +83,19 @@ const NewsField = (props) => {
         loader={<Loading />}
       >
         <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-          {articles && (
+          {articles &&
             articles.map((element, index) => (
               <div className="" key={index}>
                 <NewsCard
                   title={element.title}
-                  description={element.description}
-                  imageUrl={element.urlToImage}
+                  description={element.text}
+                  imageUrl={element.image}
                   author={element.author}
-                  date={element.publishedAt}
-                  content={element.content}
+                  date={element.publish_date}
                   newsUrl={element.url}
                 />
               </div>
-            ))
-          )}
+            ))}
         </div>
       </InfiniteScroll>
     </div>

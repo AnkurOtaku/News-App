@@ -15,6 +15,11 @@ function Error() {
       description:
         "Your API key was missing from the request, or wasn't correct.",
     },
+    404: {
+      heading: "Network Error",
+      description:
+        "Looks like you are offline. Please check your internet connection.",
+    },
     426: {
         heading: "Data Not For Production Use",
         description:
@@ -28,11 +33,6 @@ function Error() {
     500: {
       heading: "Server Error",
       description: "Something went wrong on our side.",
-    },
-    404: {
-      heading: "Network Error",
-      description:
-        "Looks like you are offline. Please check your internet connection.",
     },
   };
 
@@ -88,19 +88,6 @@ function Error() {
             "urlToImage": "https://media.npr.org/assets/img/2023/12/08/ndilekamandeka_zoom_wide-42fa29d5e6e386b33157ede260c89ae2de2e11ef-s1400-c100.jpg",
             "publishedAt": "2023-12-08T16:44:48Z",
             "content": "Ndileka Mandela, the eldest of Nelson Mandela's grandchildren, during her Zoom interview with NPR. A climate activist, she had spoken at COP28 earlier in the week, the climate summit, and returned ho… [+10914 chars]"
-        },
-        {
-            "source": {
-                "id": null,
-                "name": "Slashdot.org"
-            },
-            "author": "msmash",
-            "title": "Vanishing Graduate Tech Jobs Worsen Modi's Headache Before Elections",
-            "description": "For years, India's tech graduates could bank on a job offer from one of the country's IT giants. Now those starting positions are suddenly waning, leaving hundreds of thousands in peril and creating a fresh headache for Prime Minister Narendra Modi. From a re…",
-            "url": "https://tech.slashdot.org/story/23/12/01/1555202/vanishing-graduate-tech-jobs-worsen-modis-headache-before-elections",
-            "urlToImage": "https://a.fsdn.com/sd/topics/business_64.png",
-            "publishedAt": "2023-12-01T16:00:00Z",
-            "content": "Frankly, I don't blame the Indians, who I blame is the corporations hiring them. Corporations want cheap uber alles, and that's what they get. Quality doesn't even enter the equation, because when a … [+314 chars]"
         },
         {
             "source": {
@@ -597,6 +584,8 @@ function Error() {
             "content": "Its December, which means that even the most grinchy among us must agree: the holidays are upon us. If the TV that makes you feel coziest is not a plaid flannel Hallmark movie but a sitcom that might… [+34750 chars]"
         }
     ];
+
+    console.log(error);
 
   return (
     error && (

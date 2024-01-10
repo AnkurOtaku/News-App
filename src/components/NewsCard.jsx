@@ -7,8 +7,7 @@ const NewsItem = ({
   imageUrl,
   newsUrl,
   author,
-  date,
-  content,
+  date
 }) => {
   return (
     <div className="w-full border rounded-md h-full overflow-x-hidden hover:shadow-xl hover:shadow-[#A13737]">
@@ -23,7 +22,7 @@ const NewsItem = ({
           {title.slice(0, 60)}
         </div>
         <p className="mx-2 text-wrap break-words">
-          {description ? description.slice(0, 120) : content}...
+          {description ? description.slice(0, 120) : "No description fetched"}...
         </p>
         <br />
         {newsUrl && (

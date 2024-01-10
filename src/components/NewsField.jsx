@@ -22,6 +22,7 @@ const NewsField = (props) => {
 
   useEffect(() => {
     setArticles([]);
+    setError(false);
     setTotalResults(0);
     setPage(1);
     updateNews();

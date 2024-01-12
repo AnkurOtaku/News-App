@@ -3,7 +3,8 @@ import axios from "axios";
 import Loading from "./Loading";
 import { AppContext } from "../store/store";
 
-let lat=0,lon=0;
+let lat = 0,
+  lon = 0;
 function Weather() {
   const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
   const [weatherData, setWeatherData] = useState(null);
@@ -38,25 +39,24 @@ function Weather() {
     // data of desired country
     const getCountryLocation = async () => {
       try {
-        const city = await axios.get(
-          "http://api.openweathermap.org/geo/1.0/direct?",
+        const response = await axios.get(
+          `https://api.apilayer.com/world_news/geo-coordinates?location=${country.capital}`,
           {
-            params: {
-              q: country.capital,
-              limit: 5,
-              appid: apiKey,
+            headers: {
+              apikey: process.env.REACT_APP_NEWS_API_KEY,
             },
           }
         );
-        lat = city.data[0].lat;
-        lon = city.data[0].lon;
+        const result = response.data;
+        lat = result.latitude;
+        lon = result.longitude;
       } catch (error) {
         console.error("Error fetching weather data:", error.message);
       }
     };
 
     // fetching weather data
-    const fetchData = async() => {
+    const fetchData = async () => {
       try {
         const response = await axios.get(
           "https://api.openweathermap.org/data/2.5/weather?",
@@ -76,10 +76,10 @@ function Weather() {
       } catch (error) {
         console.error("Error fetching weather data:", error.message);
       }
-    }
+    };
 
     // fetch weather icon
-    const fetchIcon = async(apiResponse) =>{
+    const fetchIcon = async (apiResponse) => {
       try {
         const response = await fetch(
           `https://openweathermap.org/img/wn/${apiResponse.weather[0].icon}@2x.png`
@@ -94,12 +94,11 @@ function Weather() {
       } catch (error) {
         console.error("Error fetching image:", error.message);
       }
-    }
+    };
 
     country ? getCountryLocation() : getLiveLocation();
     fetchData();
-
-  }, [country,apiKey]);
+  }, [country, apiKey]);
 
   if (!weatherData) {
     return (
@@ -163,16 +162,16 @@ function Weather() {
           <div className="mx-2">{weatherData.main.humidity}</div>
         </div>
         <button
-          className="px-3 rounded-md bg-[#338496] active:bg-[#76e8ec]"
+          className="p-2 h-fit rounded-full active:bg-grey"
           onClick={() => {
             setToggle(!toggle);
           }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="17"
-            height="16"
-            viewBox="0 0 17 16"
+            width="13"
+            height="13"
+            viewBox="0 0 16 15"
             fill="none"
           >
             <path
@@ -208,12 +207,19 @@ function Weather() {
 		c-5.523,0-10-4.478-10-10s4.477-10,10-10s10,4.478,10,10S37.523,34,32,34z"
               />
             </svg>
-            {country? ` ${country.capital}`: ` (${lat} ${lon})`}
+            {country ? ` ${country.capital}` : ` (${lat} ${lon})`}
           </div>
-          <div className="text-center">Feels Like : <b>{weatherData.main.feels_like}°C</b></div>
-          <div className="text-center"> Min/Max Temp: <b>{weatherData.main.temp_min}°C</b>/<b>{weatherData.main.temp_max}°C</b>
+          <div className="text-center">
+            Feels Like : <b>{weatherData.main.feels_like}°C</b>
           </div>
-          <div className="text-center">Visibility: <b>{weatherData.visibility/1000}km</b></div>
+          <div className="text-center">
+            {" "}
+            Min/Max Temp: <b>{weatherData.main.temp_min}°C</b>/
+            <b>{weatherData.main.temp_max}°C</b>
+          </div>
+          <div className="text-center">
+            Visibility: <b>{weatherData.visibility / 1000}km</b>
+          </div>
         </div>
       )}
     </div>

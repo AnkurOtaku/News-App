@@ -1,10 +1,10 @@
 import React from 'react'
-import loading from './loading.gif';
+import loading from './butterfly.gif';
 
 function Loading() {
   return (
       <div className='flex justify-center'>
-        <img src={loading} alt='loading' height='70px' width='60px'/>
+        <img src={loading} alt='loading' height='70px' width='80px' />
       </div>
     )
 }

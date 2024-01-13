@@ -34,6 +34,10 @@ function Error() {
       heading: "Server Error",
       description: "Something went wrong on our side.",
     },
+    524: {
+      heading: "Server Error",
+      description: "Something went wrong on API data provider.",
+    },
   };
 
   const articles =  [

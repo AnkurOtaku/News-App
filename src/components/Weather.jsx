@@ -3,8 +3,92 @@ import axios from "axios";
 import Loading from "./Loading";
 import { AppContext } from "../store/store";
 
-let lat = 0,
-  lon = 0;
+let lat = 0,lon = 0;
+
+// get real location data
+const getLiveLocation = async () => {
+  try {
+    const currentLocation = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    });
+    lat = currentLocation.lat;
+    lon = currentLocation.lon;
+  } catch (error) {
+    console.error("Error fetching current weather data:", error.message);
+  }
+};
+
+// data of desired country
+const getCountryLocation = async (country) => {
+  try {
+    const response = await axios.get(
+      `https://api.apilayer.com/world_news/geo-coordinates?location=${country.capital}`,
+      {
+        headers: {
+          apikey: process.env.REACT_APP_NEWS_API_KEY,
+        },
+      }
+    );
+    const result = response.data;
+    lat = result.latitude;
+    lon = result.longitude;
+  } catch (error) {
+    console.error("Error fetching weather data:", error.message);
+  }
+};
+
+// fetching weather data
+const fetchData = async (country, apiKey, setWeatherData, fetchIcon, setIcon) => {
+  try {
+    await Promise.all([country ? getCountryLocation(country) : getLiveLocation()]);
+    const response = await axios.get(
+      "https://api.openweathermap.org/data/2.5/weather?",
+      {
+        params: {
+          appid: apiKey,
+          lat: lat,
+          lon: lon,
+          units: "metric",
+        },
+      }
+    );
+
+    const apiResponse = response.data;
+    setWeatherData(apiResponse);
+    fetchIcon(apiResponse, setIcon);
+  } catch (error) {
+    console.error("Error fetching weather data:", error.message);
+  }
+};
+
+// fetch weather icon
+const fetchIcon = async (apiResponse, setIcon) => {
+  try {
+    const response = await fetch(
+      `https://openweathermap.org/img/wn/${apiResponse.weather[0].icon}@2x.png`
+    );
+    const blob = await response.blob();
+
+    // Create object URL for the blob
+    const objectUrl = URL.createObjectURL(blob);
+
+    // Set the object URL as the image source
+    setIcon(objectUrl);
+  } catch (error) {
+    console.error("Error fetching image:", error.message);
+  }
+};
+
 function Weather() {
   const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
   const [weatherData, setWeatherData] = useState(null);
@@ -13,91 +97,30 @@ function Weather() {
   const [icon, setIcon] = useState(null);
 
   useEffect(() => {
-    // get real location data
-    const getLiveLocation = async () => {
-      try {
-        const currentLocation = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              resolve({
-                lat: position.coords.latitude,
-                lon: position.coords.longitude,
-              });
-            },
-            (error) => {
-              reject(error);
-            }
-          );
-        });
-        lat = currentLocation.lat;
-        lon = currentLocation.lon;
-      } catch (error) {
-        console.error("Error fetching current weather data:", error.message);
+    console.log("Weather Dependencies: ", country);
+    console.log('inside weather useEffect');
+
+    const effectCallback = async () => {
+      if (country) {
+        try {
+          await getCountryLocation(country);
+        } catch (error) {
+          console.error("Error fetching country location:", error.message);
+        }
+      } else {
+        try {
+          await getLiveLocation();
+        } catch (error) {
+          console.error("Error fetching live location:", error.message);
+        }
       }
+
+      // Fetch weather data and icon
+      fetchData(country, apiKey, setWeatherData, fetchIcon, setIcon);
     };
 
-    // data of desired country
-    const getCountryLocation = async () => {
-      try {
-        const response = await axios.get(
-          `https://api.apilayer.com/world_news/geo-coordinates?location=${country.capital}`,
-          {
-            headers: {
-              apikey: process.env.REACT_APP_NEWS_API_KEY,
-            },
-          }
-        );
-        const result = response.data;
-        lat = result.latitude;
-        lon = result.longitude;
-      } catch (error) {
-        console.error("Error fetching weather data:", error.message);
-      }
-    };
-
-    // fetching weather data
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://api.openweathermap.org/data/2.5/weather?",
-          {
-            params: {
-              appid: apiKey,
-              lat: lat,
-              lon: lon,
-              units: "metric",
-            },
-          }
-        );
-
-        const apiResponse = response.data;
-        setWeatherData(apiResponse);
-        fetchIcon(apiResponse);
-      } catch (error) {
-        console.error("Error fetching weather data:", error.message);
-      }
-    };
-
-    // fetch weather icon
-    const fetchIcon = async (apiResponse) => {
-      try {
-        const response = await fetch(
-          `https://openweathermap.org/img/wn/${apiResponse.weather[0].icon}@2x.png`
-        );
-        const blob = await response.blob();
-
-        // Create object URL for the blob
-        const objectUrl = URL.createObjectURL(blob);
-
-        // Set the object URL as the image source
-        setIcon(objectUrl);
-      } catch (error) {
-        console.error("Error fetching image:", error.message);
-      }
-    };
-
-    country ? getCountryLocation() : getLiveLocation();
-    fetchData();
+    // Call the effect callback
+    effectCallback();
   }, [country, apiKey]);
 
   if (!weatherData) {
@@ -162,7 +185,7 @@ function Weather() {
           <div className="mx-2">{weatherData.main.humidity}</div>
         </div>
         <button
-          className="p-2 h-fit rounded-full active:bg-grey"
+          className="p-2 my-auto h-fit rounded-md active:bg-grey"
           onClick={() => {
             setToggle(!toggle);
           }}

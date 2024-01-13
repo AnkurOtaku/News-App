@@ -1,91 +1,111 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import { AppContext } from "../store/store";
 import Loading from "./Loading";
 import NewsCard from "./NewsCard";
-import PropTypes from "prop-types";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-const NewsField = (props) => {
+const fetchNews = async (
+  setLoading,
+  page,
+  setPage,
+  querry,
+  category,
+  country,
+  pageSize,
+  requestOptions,
+  setArticles,
+  setTotalResults,
+  setError
+) => {
+  let url = `https://api.apilayer.com/world_news/search-news?text=${
+    querry ? querry : category
+  }&${country ? `source-countries=${country.code}&` : ""}number=${
+    12 * page + pageSize
+  }&offset=${12 * page}&sort=publish-time&language=en&sort-direction=desc`;
+
+  try {
+    page === 0 && setLoading(true);
+    let data = await fetch(url, requestOptions);
+    if (data.status === 200) {
+      let parsedData = await data.json();
+      setArticles((prevArticles) => [...prevArticles, ...parsedData.news]);
+      setTotalResults(parsedData.available);
+      page === 0 && setLoading(false);
+      setPage((prevPage) => prevPage + 1);
+    } else {
+      page === 0 && setLoading(false);
+      setError(data.status);
+    }
+  } catch (error) {
+    console.error("Error fetching current news data:", error);
+    setError(524);
+    page === 0 && setLoading(false);
+  }
+};
+
+const NewsField = () => {
+  const pageSize = 12;
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const { country, querry, category, setError } = useContext(AppContext);
 
-  var myHeaders = new Headers();
-  myHeaders.append("apikey", process.env.REACT_APP_NEWS_API_KEY);
+  const requestOptions = useMemo(() => {
+    var myHeaders = new Headers();
+    myHeaders.append("apikey", process.env.REACT_APP_NEWS_API_KEY);
 
-  var requestOptions = {
-    method: "GET",
-    redirect: "follow",
-    headers: myHeaders,
-  };
+    return {
+      method: "GET",
+      redirect: "follow",
+      headers: myHeaders,
+    };
+  }, []);
 
   useEffect(() => {
+    console.log("News Dependencies:", country, querry, category, pageSize, requestOptions);
     setArticles([]);
     setError(false);
     setTotalResults(0);
-    setPage(1);
-    updateNews();
-  }, [country, querry, category]);
+    setPage(0);
+    console.log("inside news useEffect");
 
-  const updateNews = async () => {
-    setLoading(true);
-
-    let url = `https://api.apilayer.com/world_news/search-news?${
-      querry ? `text=${querry}&` : ''
-    }${country ? `source-countries=${country.code}&` : ''}number=${
-      props.pageSize
-    }&sort=publish-time&language=en&sort-direction=desc`;
-
-    try {
-      let data = await fetch(url, requestOptions);
-      if (data.status === 200) {
-        let parsedData = await data.json();
-        setArticles((prevArticles) => [...prevArticles, ...parsedData.news]);
-        setTotalResults(parsedData.available);
-      } else {
-        setError(data.status);
-      }
-    } catch (error) {
-      console.error("Error fetching current news data:", error);
-      setError(404);
-    }
-    setLoading(false);
-  };
-
-  const fetchMoreData = async () => {
-    let url = `https://api.apilayer.com/world_news/search-news?${
-      querry ? `text=${querry}&` : ''
-    }${country ? `source-countries=${country.code}&` : ''}number=${
-      12 * page + props.pageSize
-    }&offset=${
-      12 * page
-    }&sort=publish-time&language=en&sort-direction=desc`;
-
-    try {
-      let data = await fetch(url, requestOptions);
-      if (data.status === 200) {
-        let parsedData = await data.json();
-        setArticles((prevArticles) => [...prevArticles, ...parsedData.news]);
-        setTotalResults(parsedData.available);
-        setPage((prevPage) => prevPage + 1);
-      } else {
-        setError(data.status);
-      }
-    } catch (error) {
-      console.error("Error fetching current news data:", error);
-      setError(404);
-    }
-  };
+    fetchNews(
+      setLoading,
+      0,
+      setPage,
+      querry,
+      category,
+      country,
+      pageSize,
+      requestOptions,
+      setArticles,
+      setTotalResults,
+      setError
+    );
+  }, [country, querry, category, pageSize, requestOptions]);
 
   return (
     <div className="my-4">
       {loading && <Loading />}
       <InfiniteScroll
         dataLength={articles.length}
-        next={fetchMoreData}
-        hasMore={articles.length !== totalResults}
+        next={() =>
+          fetchNews(
+            setLoading,
+            page + 1,
+            setPage,
+            querry,
+            category,
+            country,
+            pageSize,
+            requestOptions,
+            setArticles,
+            setTotalResults,
+            setError
+          )
+        }
+        hasMore={articles.length < 100 && totalResults > 0}
         loader={<Loading />}
       >
         <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
@@ -104,26 +124,9 @@ const NewsField = (props) => {
             ))}
         </div>
       </InfiniteScroll>
+      {articles.length < 100 && totalResults > 0 && <div className=" text-center capitalize">No more news</div>}
     </div>
   );
-};
-
-const currentDate = new Date();
-const currentMonth = currentDate.getMonth() + 1;
-const currentYear = currentDate.getFullYear();
-
-NewsField.defaultProps = {
-  pageSize: 12,
-  querry: "new",
-  newsFrom: `${currentYear}-${currentMonth}-1`,
-  newsTo: `${currentDate}`,
-};
-
-NewsField.propTypes = {
-  pageSize: PropTypes.number,
-  querry: PropTypes.string,
-  newsFrom: PropTypes.string,
-  newsTo: PropTypes.string,
 };
 
 export default NewsField;

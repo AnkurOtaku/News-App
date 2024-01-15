@@ -8,7 +8,11 @@ const NewsItem = ({ title, description, imageUrl, newsUrl, author, date }) => {
   const decodedTitle = he.decode(title);
 
   return (
-    <div className="w-full border rounded-md h-full overflow-x-hidden shadow-md hover:border-[#A13737] hover:border-2">
+    <div
+      className="w-full border rounded-md h-full overflow-x-hidden shadow-md hover:border-[#A13737] hover:border-2"
+      onMouseEnter={() => setToggleTitle(false)}
+      onMouseLeave={() => setToggleTitle(true)}
+    >
       <img
         src={
           imageUrl
@@ -18,15 +22,12 @@ const NewsItem = ({ title, description, imageUrl, newsUrl, author, date }) => {
               : imageUrl
             : imageUrl
         }
-        className="object-cover aspect-video"
+        className="w-full object-cover aspect-video"
         alt="..."
         loading="lazy"
       />
       <div>
-        <div
-          className="mx-2 text-lg break-words font-semibold"
-          onClick={() => setToggleTitle(!toggleTitle)}
-        >
+        <div className="mx-2 text-lg break-words font-semibold">
           {toggleTitle
             ? `${decodedTitle.slice(0, 60)}${
                 decodedTitle.length >= 60 ? "..." : ""

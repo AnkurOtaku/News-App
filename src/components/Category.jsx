@@ -6,11 +6,12 @@ function Category() {
   const list = [
     "general",
     "business",
-    "entertainment",
+    "trending",
     "health",
     "science",
     "sports",
-    "technology",
+    "tech",
+    "politics",
   ];
 
   function handleClick(value) {
@@ -20,10 +21,10 @@ function Category() {
   return (
     <>
       {!querry && !error && (
-        <div className="mx-auto max-w-5xl grid grid-cols-3 gap-2 p-1 md:p-2 text-sm md:text-base">
+        <div className="mx-auto max-w-5xl grid grid-cols-4 gap-2 p-1 md:p-2 text-sm md:text-base">
           {list.map((item) => (
             <button key={item}
-              className={`border rounded-md px-2 py-1 capitalize ${
+              className={`border rounded-md text-center py-1 capitalize ${
                 category === item
                   ? "bg-[#223363] text-white"
                   : "hover:bg-[#4963a8] hover:text-white"

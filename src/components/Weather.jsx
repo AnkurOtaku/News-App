@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
-import Loading from "./Loading";
 import { AppContext } from "../store/store";
 
-let lat = 0,lon = 0;
+let lat = 0,
+  lon = 0;
 
 // get real location data
 const getLiveLocation = async () => {
@@ -48,9 +48,17 @@ const getCountryLocation = async (country) => {
 };
 
 // fetching weather data
-const fetchData = async (country, apiKey, setWeatherData, fetchIcon, setIcon) => {
+const fetchData = async (
+  country,
+  apiKey,
+  setWeatherData,
+  fetchIcon,
+  setIcon
+) => {
   try {
-    await Promise.all([country ? getCountryLocation(country) : getLiveLocation()]);
+    await Promise.all([
+      country ? getCountryLocation(country) : getLiveLocation(),
+    ]);
     const response = await axios.get(
       "https://api.openweathermap.org/data/2.5/weather?",
       {
@@ -77,6 +85,7 @@ const fetchIcon = async (apiResponse, setIcon) => {
     const response = await fetch(
       `https://openweathermap.org/img/wn/${apiResponse.weather[0].icon}@2x.png`
     );
+    
     const blob = await response.blob();
 
     // Create object URL for the blob
@@ -97,9 +106,6 @@ function Weather() {
   const [icon, setIcon] = useState(null);
 
   useEffect(() => {
-    console.log("Weather Dependencies: ", country);
-    console.log('inside weather useEffect');
-
     const effectCallback = async () => {
       if (country) {
         try {
@@ -124,15 +130,11 @@ function Weather() {
   }, [country, apiKey]);
 
   if (!weatherData) {
-    return (
-      <div className="w-full bg-[#37A7BF] text-black">
-        <Loading />
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="w-full bg-[#37A7BF] text-black">
+    <div className={`w-full bg-cover bg-center text-black bg-01d`}>
       <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2">
         <div className="flex place-content-center items-center">
           {icon && <img src={icon} alt="weather icon" className="w-[40px]" />}

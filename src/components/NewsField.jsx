@@ -63,12 +63,10 @@ const NewsField = () => {
   }, []);
 
   useEffect(() => {
-    console.log("News Dependencies:", country, querry, category, pageSize, requestOptions);
     setArticles([]);
     setError(false);
     setTotalResults(0);
     setPage(0);
-    console.log("inside news useEffect");
 
     fetchNews(
       setLoading,
@@ -108,7 +106,7 @@ const NewsField = () => {
         hasMore={articles.length < 100 && totalResults > 0}
         loader={<Loading />}
       >
-        <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="mx-auto max-w-6xl px-4 grid grid-cols-1 min-[500px]:grid-cols-2 md:grid-cols-3 gap-2">
           {articles &&
             articles.map((element, index) => (
               <div className="" key={index}>
@@ -124,7 +122,6 @@ const NewsField = () => {
             ))}
         </div>
       </InfiniteScroll>
-      {articles.length < 100 && totalResults > 0 && <div className=" text-center capitalize">No more news</div>}
     </div>
   );
 };

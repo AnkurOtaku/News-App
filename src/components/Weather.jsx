@@ -85,7 +85,7 @@ const fetchIcon = async (apiResponse, setIcon) => {
     const response = await fetch(
       `https://openweathermap.org/img/wn/${apiResponse.weather[0].icon}@2x.png`
     );
-    
+
     const blob = await response.blob();
 
     // Create object URL for the blob
@@ -134,8 +134,10 @@ function Weather() {
   }
 
   return (
-    <div className={`w-full bg-cover bg-center text-black bg-01d`}>
-      <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2">
+    <div
+      className={`w-full bg-cover bg-center text-black ${`bg-${weatherData.weather[0].icon}`}`}
+    >
+      <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2 *:px-1 *:rounded-xl *:bg-[#dadadaab]">
         <div className="flex place-content-center items-center">
           {icon && <img src={icon} alt="weather icon" className="w-[40px]" />}
           <div className="mx-2 capitalize">{weatherData.main.temp}°C</div>
@@ -187,7 +189,7 @@ function Weather() {
           <div className="mx-2">{weatherData.main.humidity}</div>
         </div>
         <button
-          className="p-2 my-auto h-fit rounded-md active:bg-grey"
+          className="p-2 px-4 my-auto h-full rounded-md active:bg-grey"
           onClick={() => {
             setToggle(!toggle);
           }}
@@ -210,7 +212,7 @@ function Weather() {
         </button>
       </div>
       {toggle && (
-        <div className="mx-auto max-w-5xl flex justify-evenly gap-2 p-1 md:p-2">
+        <div className="mx-auto max-w-5xl flex justify-evenly gap-2 p-1 md:p-2 *:md:px-2 *:rounded-xl *:bg-[#dadadaab]">
           <div className="text-center">
             <svg
               version="1.0"

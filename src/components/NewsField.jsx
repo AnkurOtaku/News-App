@@ -84,7 +84,7 @@ const NewsField = () => {
   }, [country, querry, category, pageSize, requestOptions]);
 
   return (
-    <div className="my-4">
+    <div className="py-4">
       {loading && <Loading />}
       <InfiniteScroll
         dataLength={articles.length}

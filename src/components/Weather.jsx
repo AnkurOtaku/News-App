@@ -1,9 +1,47 @@
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { AppContext } from "../store/store";
+import d01 from "./weather/01d.gif";
+import d02 from "./weather/02d.gif";
+import d03 from "./weather/03d.gif";
+import d04 from "./weather/04d.gif";
+import d09 from "./weather/09d.gif";
+import d10 from "./weather/10d.gif";
+import d11 from "./weather/11d.gif";
+import d13 from "./weather/13d.gif";
+import d50 from "./weather/50d.gif";
+import n01 from "./weather/01n.gif";
+import n02 from "./weather/02n.gif";
+import n03 from "./weather/03n.gif";
+import n04 from "./weather/04n.gif";
+import n09 from "./weather/09n.gif";
+import n10 from "./weather/10n.gif";
+import n11 from "./weather/11n.gif";
+import n13 from "./weather/13n.gif";
+import n50 from "./weather/50n.gif";
 
 let lat = 0,
   lon = 0;
+const urlArray = [
+  { key: "01d", url: d01 },
+  { key: "02d", url: d02 },
+  { key: "03d", url: d03 },
+  { key: "04d", url: d04 },
+  { key: "09d", url: d09 },
+  { key: "10d", url: d10 },
+  { key: "11d", url: d11 },
+  { key: "13d", url: d13 },
+  { key: "50d", url: d50 },
+  { key: "01n", url: n01 },
+  { key: "02n", url: n02 },
+  { key: "03n", url: n03 },
+  { key: "04n", url: n04 },
+  { key: "09n", url: n09 },
+  { key: "10n", url: n10 },
+  { key: "11n", url: n11 },
+  { key: "13n", url: n13 },
+  { key: "50n", url: n50 },
+];
 
 // get real location data
 const getLiveLocation = async () => {
@@ -53,7 +91,8 @@ const fetchData = async (
   apiKey,
   setWeatherData,
   fetchIcon,
-  setIcon
+  setIcon,
+  setWeatherBackgroundUrl
 ) => {
   try {
     await Promise.all([
@@ -73,14 +112,14 @@ const fetchData = async (
 
     const apiResponse = response.data;
     setWeatherData(apiResponse);
-    fetchIcon(apiResponse, setIcon);
+    fetchIcon(apiResponse, setIcon, setWeatherBackgroundUrl);
   } catch (error) {
     console.error("Error fetching weather data:", error.message);
   }
 };
 
 // fetch weather icon
-const fetchIcon = async (apiResponse, setIcon) => {
+const fetchIcon = async (apiResponse, setIcon, setWeatherBackgroundUrl) => {
   try {
     const response = await fetch(
       `https://openweathermap.org/img/wn/${apiResponse.weather[0].icon}@2x.png`
@@ -93,6 +132,13 @@ const fetchIcon = async (apiResponse, setIcon) => {
 
     // Set the object URL as the image source
     setIcon(objectUrl);
+
+    const matchingIcon = urlArray.find(
+      (icons) => apiResponse.weather[0].icon === icons.key
+    );
+    console.log('matched icon : '+ matchingIcon);
+
+    setWeatherBackgroundUrl(matchingIcon.url);
   } catch (error) {
     console.error("Error fetching image:", error.message);
   }
@@ -104,6 +150,7 @@ function Weather() {
   const { country } = useContext(AppContext);
   const [toggle, setToggle] = useState(false);
   const [icon, setIcon] = useState(null);
+  const [weatherBackgroundUrl, setWeatherBackgroundUrl] = useState("");
 
   useEffect(() => {
     const effectCallback = async () => {
@@ -122,7 +169,14 @@ function Weather() {
       }
 
       // Fetch weather data and icon
-      fetchData(country, apiKey, setWeatherData, fetchIcon, setIcon);
+      fetchData(
+        country,
+        apiKey,
+        setWeatherData,
+        fetchIcon,
+        setIcon,
+        setWeatherBackgroundUrl
+      );
     };
 
     // Call the effect callback
@@ -135,14 +189,15 @@ function Weather() {
 
   return (
     <div
-      className={`w-full bg-cover bg-center text-black ${`bg-${weatherData.weather[0].icon}`}`}
+      className={`w-full bg-cover bg-center text-black `}
+      style={{ backgroundImage: `url(${weatherBackgroundUrl})` }}
     >
-      <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2 *:px-1 *:rounded-xl *:bg-[#dadadaab]">
-        <div className="flex place-content-center items-center">
+      <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2 *:rounded-xl *:bg-[#dadadaab]">
+        <div className="px-1 flex place-content-center items-center">
           {icon && <img src={icon} alt="weather icon" className="w-[40px]" />}
           <div className="mx-2 capitalize">{weatherData.main.temp}°C</div>
         </div>
-        <div className="flex place-content-center items-center">
+        <div className="px-1 flex place-content-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="26"
@@ -165,7 +220,7 @@ function Weather() {
           </svg>
           <div className="mx-2">{weatherData.wind.speed}m/sec</div>
         </div>
-        <div className="flex place-content-center items-center">
+        <div className="px-1 flex place-content-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -189,7 +244,7 @@ function Weather() {
           <div className="mx-2">{weatherData.main.humidity}</div>
         </div>
         <button
-          className="p-2 px-4 my-auto h-full rounded-md active:bg-grey"
+          className="py-3 px-6 my-auto h-full rounded-md active:bg-grey"
           onClick={() => {
             setToggle(!toggle);
           }}

@@ -13,12 +13,12 @@ import d50 from "./weather/50d.gif";
 import n01 from "./weather/01n.gif";
 import n02 from "./weather/02n.gif";
 import n03 from "./weather/03n.gif";
-import n04 from "./weather/04n.gif";
-import n09 from "./weather/09n.gif";
+import n04 from "./weather/03n.gif";
+import n09 from "./weather/09d.gif";
 import n10 from "./weather/10n.gif";
-import n11 from "./weather/11n.gif";
+import n11 from "./weather/11d.gif";
 import n13 from "./weather/13n.gif";
-import n50 from "./weather/50n.gif";
+import n50 from "./weather/50d.gif";
 
 let lat = 0,
   lon = 0;
@@ -136,7 +136,6 @@ const fetchIcon = async (apiResponse, setIcon, setWeatherBackgroundUrl) => {
     const matchingIcon = urlArray.find(
       (icons) => apiResponse.weather[0].icon === icons.key
     );
-    console.log('matched icon : '+ matchingIcon);
 
     setWeatherBackgroundUrl(matchingIcon.url);
   } catch (error) {
@@ -189,7 +188,7 @@ function Weather() {
 
   return (
     <div
-      className={`w-full bg-cover bg-center text-black `}
+      className={`w-full sticky top-0 bg-cover bg-center text-black `}
       style={{ backgroundImage: `url(${weatherBackgroundUrl})` }}
     >
       <div className="mx-auto max-w-5xl flex justify-evenly p-1 md:p-2 *:rounded-xl *:bg-[#dadadaab]">

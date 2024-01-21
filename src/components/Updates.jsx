@@ -29,7 +29,7 @@ function Update({ popup, setPopup }) {
     return () => clearInterval(interval);
   }, []);
 
-  const overlayClasses = popup ? "fixed inset-0 backdrop-blur-md" : "hidden";
+  const overlayClasses = popup ? "fixed z-10 inset-0 backdrop-blur-md" : "hidden";
 
   if (!commits) {
     return (

@@ -122,6 +122,7 @@ const NewsField = () => {
             ))}
         </div>
       </InfiniteScroll>
+      {!loading && totalResults===0 && <div className="text-center">-- No more news to be found --</div>}
     </div>
   );
 };

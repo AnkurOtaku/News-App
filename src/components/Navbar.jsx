@@ -10,8 +10,8 @@ function Navbar() {
 
   const handleClick = (value) => {
     setCountry(value);
-    console.log(value);
     setDropdown(!dropdown);
+    setQuerry(false);
   };
 
   function handleSubmit(e) {
@@ -19,7 +19,6 @@ function Navbar() {
     if (e.target.elements.searchInput.value) {
       setCountry(false);
       setQuerry(e.target.elements.searchInput.value);
-      console.log(e.target.elements.searchInput.value, country);
     }
   }
 
@@ -111,7 +110,7 @@ function Navbar() {
 
             {/* Dropdown Menu */}
             {dropdown && (
-              <div className="origin-top-right absolute right-0 mt-2 rounded-md shadow-lg">
+              <div className="origin-top-right absolute z-[1] right-0 mt-2 rounded-md shadow-lg">
                 <div className="rounded-md bg-white h-80 overflow-y-auto shadow-xs">
                   <div
                     className="py-1 px-2"

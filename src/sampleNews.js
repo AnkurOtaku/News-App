@@ -1,4 +1,4 @@
-export default sampleNews = [
+const sampleNews = [
   {
       "source": {
           "id": "business-insider",
@@ -504,3 +504,5 @@ export default sampleNews = [
       "publishedAt": "2023-12-04T16:00:00Z",
   }
 ];
+
+export default sampleNews;

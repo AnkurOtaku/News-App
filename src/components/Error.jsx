@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { AppContext } from "../store/store";
 import NewsCard from "./NewsCard";
-import { sampleNews } from "../sampleNews";
+import sampleNews from "../sampleNews";
 
 function Error() {
   const { error } = useContext(AppContext);

@@ -20,8 +20,8 @@ const fetchNews = async (
   let url = `https://api.apilayer.com/world_news/search-news?text=${
     querry ? querry : category
   }&${country ? `source-countries=${country.code}&` : ""}number=${
-    12 * page + pageSize
-  }&offset=${12 * page}&sort=publish-time&language=en&sort-direction=desc`;
+    pageSize
+  }&offset=${pageSize * page}&sort=publish-time&language=en&sort-direction=desc`;
 
   try {
     page === 0 && setLoading(true);

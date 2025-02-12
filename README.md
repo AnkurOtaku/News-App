@@ -1,6 +1,6 @@
 # Live News + Weather App  
 
-The Live News + Weather App is your one-stop destination for the latest news from around the world and real-time weather updates. With powerful search capabilities and live location support, staying informed has never been easier or more convenient!  
+The Live News + Weather App is your one-stop destination for the latest news worldwide and real-time weather updates. With powerful search capabilities and live location support, staying informed has never been easier or more convenient!  
 
 ## 🚀 Features  
 - **Latest News Updates:**  
